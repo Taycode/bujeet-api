@@ -1,5 +1,5 @@
 import { Express, Request, Response } from 'express';
-import { UserRouter } from './user.router';
+import { UserRouter } from '../components/user/user.router';
 
 export const Route = (app: Express) => {
   app.use('/user', UserRouter);

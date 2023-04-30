@@ -9,10 +9,9 @@ export interface IBudgetItem {
   _id: mongoose.Schema.Types.ObjectId;
   name: string;
   budgetId: mongoose.Schema.Types.ObjectId;
-  type: string;
+  type: BudgetItemType;
   amount: number;
   date: Date;
-  interval: number;
 }
 
 
@@ -37,13 +36,8 @@ const BudgetItemSchema = new Schema<IBudgetItem>({
   },
   date: {
     type: Date,
-    required: true
+    required: false
   },
-    interval: {
-      type: Number,
-        required: false,
-    }
-
 });
 
 export const BudgetItemModel = model('budgetItems', BudgetItemSchema);

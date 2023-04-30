@@ -1,8 +1,9 @@
 import { Router } from 'express';
-import { UserController } from '../components/user/user.controller';
-import {validateToken} from "../middleware/auth.middleware";
+import {validateToken} from "../../middleware/auth.middleware";
+import {UserModule} from "./user.module";
 
-const userController = new UserController();
+const userModule = new UserModule();
+const userController = userModule.userController;
 
 const router: Router = Router();
 

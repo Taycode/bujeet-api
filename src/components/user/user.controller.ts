@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { comparePassword, generatePassword } from './user.service';
+import { UserService} from './user.service';
 import { UserRepository } from '../../database/repository/user.repository';
 import { signPayload } from '../../util/jwt.util';
 import {ICustomRequest} from "../../interface/custom-request.interface";
@@ -7,6 +7,8 @@ import {RegisterUserDto} from "./dto/register-user.dto";
 import {IUser} from "../../database/model/user";
 
 export class UserController {
+    constructor(private readonly userService: UserService) {}
+
     async loginUser(req: Request, res: Response) {
         const {email, password} = req.body;
         if (!email) {
@@ -22,7 +24,7 @@ export class UserController {
             return res.status(401).send({message: "User was not found"});
         }
 
-        const validatePassword = await comparePassword(password, user.passwordHash);
+        const validatePassword = await this.userService.comparePassword(password, user.passwordHash);
 
         if (!validatePassword) {
             return res.status(400).send({message: "Invalid password"});
@@ -49,7 +51,7 @@ export class UserController {
                 message: 'Email already exists',
             });
         }
-        const passwordHash = await generatePassword(password);
+        const passwordHash = await this.userService.generatePassword(password);
 
         const createUserPayload: Omit<IUser, '_id'> = {
             email,
