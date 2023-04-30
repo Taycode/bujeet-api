@@ -5,7 +5,6 @@ import { signPayload } from '../../util/jwt.util';
 import {ICustomRequest} from "../../interface/custom-request.interface";
 import {RegisterUserDto} from "./dto/register-user.dto";
 import {IUser} from "../../database/model/user";
-import {getCarbonIntensity} from "../../lib/carbon-intensity/intensity.service";
 
 export class UserController {
     async loginUser(req: Request, res: Response) {
@@ -55,10 +54,8 @@ export class UserController {
         const createUserPayload: Omit<IUser, '_id'> = {
             email,
             passwordHash,
-            bvn: payload.bvn,
             firstName: payload.firstName,
             lastName: payload.lastName,
-            phoneNumber: payload.phoneNumber,
         };
 
         const newUser = await UserRepository.create(createUserPayload);
@@ -70,7 +67,6 @@ export class UserController {
                 email: newUser.email,
                 firstName: newUser.firstName,
                 lastName: newUser.lastName,
-                phoneNumber: newUser.phoneNumber,
             }
         });
     }
@@ -81,15 +77,6 @@ export class UserController {
             status: true,
             message: 'User fetched',
             data: user,
-        })
-    }
-
-    async fetchCarbonIntensity(req: ICustomRequest, res: Response) {
-        const carbonData = await getCarbonIntensity();
-        return res.status(200).json({
-            status: true,
-            message: 'Data fetched',
-            data: carbonData,
         })
     }
 }
