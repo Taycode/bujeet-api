@@ -3,7 +3,7 @@ import {BudgetItemRepository, BudgetRepository} from "../../database/repository/
 import {IUser} from "../../database/model/user";
 import {BudgetItemType, IBudgetItem} from "../../database/model/budgetItem";
 import {PaystackService} from "../../lib/paystack";
-import {BudgetStatus} from "../../database/model/budget";
+import {BudgetStatus, IBudget} from "../../database/model/budget";
 
 export class BudgetService {
     constructor(
@@ -52,5 +52,55 @@ export class BudgetService {
             return this.budgetRepository.findOneAndUpdate({ _id: budgetId }, { status: BudgetStatus.active })
         }
         throw new Error('Payment was not successful');
+    }
+
+    async fetchBudgetsForProcessing() {
+        // fetch all budgets
+        const budgets = await this.budgetRepository.find({});
+    }
+
+    async processEachBudget(budget: IBudget) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() - 1);
+
+        // Fetch all re-occurring budgets
+        const dailyExpenses = await this.budgetItemRepository.find({
+            budgetId: budget._id,
+            type: BudgetItemType.recurring,
+        });
+        const oneTimeExpenses = await this.budgetItemRepository.find({
+            budgetId: budget._id,
+            type: BudgetItemType.non_recurring,
+            date: { $gte: today, $lt: tomorrow}
+        });
+
+        const expenses = [...dailyExpenses, ...oneTimeExpenses];
+        const expensesAmount = expenses.reduce((prev, next) => prev + next.amount, 0);
+
+        // Pay money to bank
+        await this.payToBank();
+    }
+
+    async payToBank() {
+        // Create Recipient
+        const createRecipient = await this.paystackService.createRecipient({
+            type: 'NUBAN',
+            name: '',
+            account_number: '',
+            bank_code: '',
+            currency: '',
+        });
+
+        // Initiate Transfer
+        const transferResponse = await this.paystackService.transfer({
+            source: '',
+            reason: '',
+            amount: 0,
+            recipient: createRecipient.data.recipient_code,
+        });
+
+        // toDo: Debit amount from wallet
     }
 }

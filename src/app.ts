@@ -3,6 +3,8 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import { Route } from './routes';
 import { Database } from './database';
+import {Cron} from "./cron";
+import {Tasks} from "./worker/tasks";
 
 export const App = {
   async boot () {
@@ -11,7 +13,8 @@ export const App = {
     app.use(bodyParser.json());
     await Database.connect();
     Route(app);
-    // Cron();
+    Cron();
+    Tasks();
     return app;
   }
 };
