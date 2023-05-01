@@ -10,6 +10,8 @@ export type IBudget = {
   userId: mongoose.Schema.Types.ObjectId;
   _id: mongoose.Schema.Types.ObjectId;
   status: BudgetStatus;
+  name: string;
+  amount: number;
 }
 
 const BudgetSchema = new Schema<IBudget>({
@@ -23,6 +25,14 @@ const BudgetSchema = new Schema<IBudget>({
     required: true,
     default: BudgetStatus.inactive,
     enum: BudgetStatus,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  amount: {
+    type: Number,
+    required: true,
   },
 }, { timestamps: true });
 
