@@ -8,10 +8,9 @@ export const config = {
   MONGO_URI: 'mongodb://127.0.0.1:27017/bujit',
   JWT_SECRET: process.env.JWT_SECRET || 'secret',
   REDIS_URL: process.env.REDIS_URL || 'redis:redis_db:6379',
-  SEERBIT: {
-      SECRET: process.env.SEERBIT_SECRET as string,
-      PUBLIC: process.env.SEERBIT_PUBLIC as string,
-      BASE_URL: process.env.SEERBIT_BASE_URL as string,
-      BUSINESS_NAME: process.env.SEERBIT_BUSINESS_NAME as string,
+  PAYSTACK: {
+      SECRET: process.env.PAYSTACK_SECRET as string,
+      PUBLIC: process.env.PAYSTACK_PUBLIC as string,
+      BASE_URL: process.env.PAYSTACK_BASE_URL as string,
   }
 };

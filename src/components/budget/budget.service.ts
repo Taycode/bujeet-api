@@ -2,11 +2,14 @@ import {CreateBudgetDto} from "./dto/create-budget.dto";
 import {BudgetItemRepository, BudgetRepository} from "../../database/repository/budget.repository";
 import {IUser} from "../../database/model/user";
 import {BudgetItemType, IBudgetItem} from "../../database/model/budgetItem";
+import {PaystackService} from "../../lib/paystack";
+import {BudgetStatus} from "../../database/model/budget";
 
 export class BudgetService {
     constructor(
         private readonly budgetRepository: typeof BudgetRepository,
         private readonly budgetItemRepository: typeof BudgetItemRepository,
+        private readonly paystackService: PaystackService,
     ) {}
     async createBudget(payload: CreateBudgetDto, user: IUser) {
         const budget = await this.budgetRepository.create({
@@ -41,5 +44,13 @@ export class BudgetService {
             balance,
             canProceed,
         }
+    }
+
+    async confirmBudgetPayment(budgetId: string, reference: string) {
+        const transaction = await this.paystackService.verifyTransaction(reference);
+        if (transaction.data.status === 'success') {
+            return this.budgetRepository.findOneAndUpdate({ _id: budgetId }, { status: BudgetStatus.active })
+        }
+        throw new Error('Payment was not successful');
     }
 }
