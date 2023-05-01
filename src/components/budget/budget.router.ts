@@ -1,9 +1,6 @@
-import {BudgetModule} from "./budget.module";
+import {budgetController} from "./budget.module";
 import {Router} from "express";
 import {validateToken} from "../../middleware/auth.middleware";
-
-const budgetModule = new BudgetModule();
-const budgetController = budgetModule.budgetController;
 
 const router: Router = Router();
 

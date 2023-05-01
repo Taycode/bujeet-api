@@ -1,4 +1,4 @@
-import {Callback, FilterQuery, Model, ProjectionType, QueryOptions, UpdateQuery} from "mongoose";
+import { FilterQuery, Model, ProjectionType, QueryOptions, UpdateQuery} from "mongoose";
 
 export class BaseRepository<T> {
     private Model: Model<T>;

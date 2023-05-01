@@ -1,14 +1,10 @@
-import { Router } from 'express';
-import {validateToken} from "../../middleware/auth.middleware";
-import {UserModule} from "./user.module";
+// import {validateToken} from "../../middleware/auth.middleware";
+import {BaseRouter} from "../../common/base.router";
+import {UserController} from "./user.controller";
 
-const userModule = new UserModule();
-const userController = userModule.userController;
-
-const router: Router = Router();
-
-router.post('/login', userController.loginUser);
-router.post('/register', userController.registerUser);
-router.get('/fetch', validateToken, userController.fetchLoggedInUser);
-
-export const UserRouter: Router = router;
+export class UserRouter extends BaseRouter<UserController>{
+    protected initRoutes() {
+        this.router.post('/login', this.controller.loginUser);
+        this.router.post('/register', this.controller.registerUser);
+    }
+}

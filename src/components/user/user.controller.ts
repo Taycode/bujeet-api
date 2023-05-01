@@ -7,7 +7,9 @@ import {RegisterUserDto} from "./dto/register-user.dto";
 import {IUser} from "../../database/model/user";
 
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+    constructor(
+        private readonly userService: UserService,
+    ) {}
 
     async loginUser(req: Request, res: Response) {
         const {email, password} = req.body;

@@ -12,6 +12,7 @@ export type IBudget = {
   status: BudgetStatus;
   name: string;
   amount: number;
+  balance: number;
 }
 
 const BudgetSchema = new Schema<IBudget>({
@@ -34,6 +35,11 @@ const BudgetSchema = new Schema<IBudget>({
     type: Number,
     required: true,
   },
+  balance: {
+    type: Number,
+    required: false,
+    default: 0,
+    },
 }, { timestamps: true });
 
 export const BudgetModel = model('budget', BudgetSchema);

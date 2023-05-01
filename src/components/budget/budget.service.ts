@@ -4,12 +4,15 @@ import {IUser} from "../../database/model/user";
 import {BudgetItemType, IBudgetItem} from "../../database/model/budgetItem";
 import {PaystackService} from "../../lib/paystack";
 import {BudgetStatus, IBudget} from "../../database/model/budget";
+import {BankService} from "../bank/bank.service";
+import {IBank} from "../../database/model/bank";
 
 export class BudgetService {
     constructor(
         private readonly budgetRepository: typeof BudgetRepository,
         private readonly budgetItemRepository: typeof BudgetItemRepository,
         private readonly paystackService: PaystackService,
+        private readonly bankService: BankService,
     ) {}
     async createBudget(payload: CreateBudgetDto, user: IUser) {
         const budget = await this.budgetRepository.create({
@@ -56,7 +59,7 @@ export class BudgetService {
 
     async fetchBudgetsForProcessing() {
         // fetch all budgets
-        const budgets = await this.budgetRepository.find({});
+        return this.budgetRepository.find({});
     }
 
     async processEachBudget(budget: IBudget) {
@@ -79,25 +82,29 @@ export class BudgetService {
         const expenses = [...dailyExpenses, ...oneTimeExpenses];
         const expensesAmount = expenses.reduce((prev, next) => prev + next.amount, 0);
 
+        const userBank = await this.bankService.fetchUserBankWithUserId(budget.userId);
+
+        if (!userBank) throw new Error('This user has no bank');
+
         // Pay money to bank
-        await this.payToBank();
+        await this.payToBank(expensesAmount, userBank);
     }
 
-    async payToBank() {
+    async payToBank(amount: number, bank: IBank) {
         // Create Recipient
         const createRecipient = await this.paystackService.createRecipient({
             type: 'NUBAN',
-            name: '',
-            account_number: '',
-            bank_code: '',
-            currency: '',
+            name: bank.accountName,
+            account_number: bank.accountNumber,
+            bank_code: bank.bankCode,
+            currency: 'NGN',
         });
 
         // Initiate Transfer
         const transferResponse = await this.paystackService.transfer({
-            source: '',
-            reason: '',
-            amount: 0,
+            source: 'balance',
+            reason: 'Budget',
+            amount,
             recipient: createRecipient.data.recipient_code,
         });
 
